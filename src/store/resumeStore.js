@@ -4,15 +4,15 @@ import axios from 'axios';
 export const useResumeStore = defineStore('resumeStore', {
   state: () => ({
     resumeAnalysis: null,
-    jobRecommendations: [],
     loading: false,
     error: null,
   }),
 
   actions: {
-    async uploadResume(file) {
+    async uploadResume(file, jobDescription) {
       const formData = new FormData();
       formData.append('resume', file);
+      formData.append('jobDescription', jobDescription);
 
       this.loading = true;
       this.error = null;
@@ -23,7 +23,6 @@ export const useResumeStore = defineStore('resumeStore', {
         });
         console.log(response.data);
         this.resumeAnalysis = response.data.analysisResult;
-        this.jobRecommendations = response.data.analysisResult.jobRecommendations;
       } catch (err) {
         this.error = err.response?.data?.message || 'Failed to upload resume.';
       } finally {
