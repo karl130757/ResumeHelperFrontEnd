@@ -11,12 +11,13 @@
         <li><strong>ATS Compatibility:</strong> {{ resumeAnalysis.feedback['ATS Compatibility'] }}</li>
         <li><strong>Experience and Skills:</strong> {{ resumeAnalysis.feedback['Experience and Skills'] }}</li>
         <li><strong>Overall Structure:</strong> {{ resumeAnalysis.feedback['Overall Structure'] }}</li>
+        <li><strong>Suggested Keywords:</strong> {{ resumeAnalysis.feedback['Suggested Keywords'] }}</li>
       </ul>
     </div>
 
     <!-- Keyword Suggestions Section -->
     <div class="card p-4 shadow-sm mt-4" v-if="resumeAnalysis.top_keywords?.length">
-      <h4>Suggested Keywords</h4>
+      <h4>Top Keywords</h4>
       <ul>
         <li v-for="(keyword, index) in resumeAnalysis.top_keywords" :key="index">
           {{ keyword.word }} ({{ keyword.count }} mentions)

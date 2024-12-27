@@ -63,11 +63,7 @@
         <!-- Display Error Message -->
         <p v-if="error" class="text-center text-danger mt-3">{{ error }}</p>
 
-        <!-- Display Analysis Result -->
-        <div v-if="resumeAnalysis" class="mt-4">
-          <h4 class="text-center">Analysis Result:</h4>
-          <p class="text-center">{{ resumeAnalysis }}</p>
-        </div>
+       
 
         <!-- Display Message if No File Uploaded -->
         <p v-if="!resume && !loading" class="text-muted mt-2 text-center">No file uploaded yet. Please choose a file.</p>
