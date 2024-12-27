@@ -9,7 +9,7 @@
     <!-- Upload Form -->
     <div class="d-flex justify-content-center">
       <div class="card p-4 shadow-lg" style="max-width: 600px; width: 100%;">
-        
+
         <!-- File Upload Section -->
         <div 
           class="file-upload-container"
@@ -50,17 +50,29 @@
 
         <!-- Button to Analyze Resume -->
         <button 
-          v-if="resume && jobDescription" 
+          v-if="resume && jobDescription && !loading" 
           class="btn btn-primary w-100" 
           @click="analyzeResume"
         >
           Analyze Resume
         </button>
 
+        <!-- Display Loading State -->
+        <p v-if="loading" class="text-center text-primary mt-3">Analyzing your resume...</p>
+
+        <!-- Display Error Message -->
+        <p v-if="error" class="text-center text-danger mt-3">{{ error }}</p>
+
+        <!-- Display Analysis Result -->
+        <div v-if="resumeAnalysis" class="mt-4">
+          <h4 class="text-center">Analysis Result:</h4>
+          <p class="text-center">{{ resumeAnalysis }}</p>
+        </div>
+
         <!-- Display Message if No File Uploaded -->
-        <p v-if="!resume" class="text-muted mt-2 text-center">No file uploaded yet. Please choose a file.</p>
+        <p v-if="!resume && !loading" class="text-muted mt-2 text-center">No file uploaded yet. Please choose a file.</p>
         <!-- Display Message if Job Description is Missing -->
-        <p v-if="!jobDescription" class="text-muted mt-2 text-center">Job description is required to analyze your resume.</p>
+        <p v-if="!jobDescription && !loading" class="text-muted mt-2 text-center">Job description is required to analyze your resume.</p>
 
       </div>
     </div>
@@ -68,6 +80,8 @@
 </template>
 
 <script>
+import { useResumeStore } from "../store/resumeStore";
+
 export default {
   data() {
     return {
@@ -77,21 +91,39 @@ export default {
       isDragging: false,       // Track drag state
     };
   },
+  computed: {
+    // Map Pinia state to computed properties
+    loading() {
+      return this.resumeStore.loading;
+    },
+    resumeAnalysis() {
+      return this.resumeStore.resumeAnalysis;
+    },
+    error() {
+      return this.resumeStore.error;
+    },
+  },
   methods: {
     handleFileUpload(event) {
       const file = event.target.files[0];
       this.resume = file;
       this.filename = file.name; // Set the filename when a file is uploaded
     },
-    analyzeResume() {
-      // Simulate navigating to the analysis page with resume filename and job description
-      this.$router.push({ 
-        path: '/analysis', 
-        query: { 
-          filename: this.resume.name, 
-          jobDescription: this.jobDescription 
-        } 
-      });
+    async analyzeResume() {
+      if (!this.resume || !this.jobDescription) return;
+
+      try {
+        // Use the store action to upload and analyze the resume
+        await this.resumeStore.uploadResume(this.resume, this.jobDescription);
+
+        // Redirect to the analysis results page with the filename as a query parameter
+        this.$router.push({
+          path: '/analysis',
+          query: { filename: this.filename }
+        });
+      } catch (error) {
+        console.error('Error analyzing resume:', error);
+      }
     },
     handleDragEnter() {
       this.isDragging = true;
@@ -111,8 +143,13 @@ export default {
       }
     },
   },
+  created() {
+    // Initialize the Pinia store
+    this.resumeStore = useResumeStore();
+  },
 };
 </script>
+
 
 <style scoped>
 /* General Card Styling */
